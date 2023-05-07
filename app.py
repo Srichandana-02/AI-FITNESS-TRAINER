@@ -2,6 +2,10 @@ from flask import Flask,redirect,url_for,render_template,request,Response
 import cv2
 import mediapipe as mp
 import numpy as np
+from gtts import gTTS  
+from playsound import playsound 
+import os
+language="en"
 
 app=Flask(__name__)
 
@@ -28,6 +32,9 @@ def gen_biceps():
        counter2=0
        stage1 = None
        stage2 = None
+
+       c1=-1
+       c2=-1
        ## Setup mediapipe instance
        with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
               while cap.isOpened():
@@ -97,6 +104,20 @@ def gen_biceps():
                                           
                      except:
                             pass
+                     if c1 != counter1:
+                            txt = "Right" + str(counter1)
+                            counter = gTTS(text=txt, lang=language, slow=False)   
+                            counter.save("rcounter.mp3")  
+                            playsound("rcounter.mp3")
+                            os.remove("rcounter.mp3")
+                     if c2 != counter2:
+                            txt = "Left" + str(counter2)
+                            counter = gTTS(text=txt, lang=language, slow=False)   
+                            counter.save("lcounter.mp3")  
+                            playsound("lcounter.mp3")
+                            os.remove("lcounter.mp3")
+                     c1 = counter1
+                     c2 = counter2
                             
                      # Render curl counter
                      # Setup status box
@@ -433,7 +454,7 @@ def login():
               res=""
               username=request.form['username']
               password=request.form['password']
-       if username=="saac" and password=="saac":
+       if username=="root" and password=="root":
               res="prepage"
        else:
               res="login"
